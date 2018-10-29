@@ -3,19 +3,18 @@
 
 import re
 import requests
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 
 response = requests.get('https://www.daydeal.ch')
-soup = BeautifulSoup(response.content)
+soup = BeautifulSoup(response.content, 'html.parser')
 
-title = soup.find("h1", {"class":"meta-first-line"}).getText()
-subtitle = soup.find("span", {"class":"meta-second-line"}).getText()
+title = soup.find('h1', {'class': ['product-description__title1']}).get_text()
+subtitle = soup.find('h2', {'class': ['product-description__title2']}).get_text()
+print("Heutiger Daydeal: "+title+" "+subtitle)
 
-price = soup.find("span", {"class":"price"}).getText()
-originalprice = soup.find("div", {"class":"originalPrice"}).getText()
-originalprice = re.sub('[\D+]', '', originalprice)
-percentage = soup.find("span", {"class":"percentage"}).getText()
+price = soup.find('h2', {'class': ['product-pricing__prices-new-price']}).get_text()
+originalprice = soup.find('strong', {'class': 'product-pricing__prices-old-price'}).get_text(strip=True)
+print("Für "+price+" "+ originalprice)
 
-print "Heutiger Daydeal: "+title+" "+subtitle
-print u"Für CHF "+price+" anstatt CHF "+originalprice+".-"
-print "Noch "+percentage+u"% verfügbar"
+percentage = soup.find('strong', {'class': 'product-progress__availability'}).get_text()
+print("Noch "+percentage+"% verfügbar")
